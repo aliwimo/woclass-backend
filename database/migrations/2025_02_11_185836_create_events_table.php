@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\SessionStatus;
+use App\Enums\EventStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sessions', function (Blueprint $table) {
+        Schema::create('events', function (Blueprint $table) {
             $table->id();
             $table->foreignId('classroom_id')->constrained('classrooms')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->text('description')->nullable();
-            $table->string('status')->default(SessionStatus::SCHEDULED->value);
+            $table->string('status')->default(EventStatus::SCHEDULED->value);
             $table->timestamps();
             $table->unique(['classroom_id', 'date', 'start_time', 'end_time']);
         });
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sessions');
+        Schema::dropIfExists('events');
     }
 };

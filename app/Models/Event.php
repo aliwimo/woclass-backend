@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\SessionStatus;
+use App\Enums\EventStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,9 +16,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $start_time
  * @property string $end_time
  * @property string $description
- * @property SessionStatus $status
+ * @property EventStatus $status
  */
-class Session extends Model
+class Event extends Model
 {
     use HasFactory;
 
@@ -38,6 +38,6 @@ class Session extends Model
         'date' => 'date',
         'start_time' => 'datetime',
         'end_time' => 'datetime',
-        'status' => SessionStatus::class,
+        'status' => EventStatus::class,
     ];
 }
