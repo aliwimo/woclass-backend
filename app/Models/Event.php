@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\EventStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
@@ -17,6 +18,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $end_time
  * @property string $description
  * @property EventStatus $status
+ *
+ * @property Classroom $classroom
+ * @property User $user
+ * @property Weekday $weekday
  */
 class Event extends Model
 {
@@ -35,9 +40,24 @@ class Event extends Model
     ];
 
     protected $casts = [
-        'date' => 'date',
-        'start_time' => 'datetime',
-        'end_time' => 'datetime',
+        'date' => 'datetime:Y-m-d',
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i',
         'status' => EventStatus::class,
     ];
+
+    public function classroom(): BelongsTo
+    {
+        return $this->belongsTo(related: Classroom::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(related: User::class);
+    }
+
+    public function weekday(): BelongsTo
+    {
+        return $this->belongsTo(related: Weekday::class);
+    }
 }
