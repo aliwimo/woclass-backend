@@ -24,4 +24,3 @@ Route::prefix('/v1')->group(function () {
         Route::post('/', [EventController::class, 'store']);
     });
 });
-
