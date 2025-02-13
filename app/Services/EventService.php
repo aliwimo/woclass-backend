@@ -22,7 +22,7 @@ class EventService
 
     public function getAllEvents(): Collection
     {
-        return $this->eventRepository->all();
+        return $this->eventRepository->query()->orderBy('created_at', 'desc')->get();
     }
 
     public function getEvents(int $classroomId, string $date): SupportCollection
