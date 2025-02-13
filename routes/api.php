@@ -14,12 +14,14 @@ Route::prefix('/v1')->group(function () {
     /** Classrooms Routes */
     Route::prefix('/classrooms')->group(callback: function () {
         Route::get('/', [ClassroomController::class, 'index']);
+        Route::get('{id}/sessions', [ClassroomController::class, 'getSessions']);
+
     });
 
     /** Events Routes */
     Route::prefix('/events')->group(callback: function () {
         Route::get('/', [EventController::class, 'index']);
-        Route::get('/sessions', [EventController::class, 'sessions']);
+        Route::post('/', [EventController::class, 'store']);
     });
 });
 

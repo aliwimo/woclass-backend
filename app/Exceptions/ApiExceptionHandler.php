@@ -42,7 +42,7 @@ class ApiExceptionHandler
         return match (true) {
             $exception instanceof ModelNotFoundException => ResponseStatus::HTTP_NOT_FOUND,
             $exception instanceof AuthorizationException => ResponseStatus::HTTP_FORBIDDEN,
-            default => ResponseStatus::HTTP_INTERNAL_SERVER_ERROR,
+            default => $exception->getCode() ?? ResponseStatus::HTTP_INTERNAL_SERVER_ERROR,
         };
     }
 
@@ -57,7 +57,7 @@ class ApiExceptionHandler
         return match (true) {
             $exception instanceof ModelNotFoundException => 'Resource not found.',
             $exception instanceof AuthorizationException => 'This action is unauthorized.',
-            default => 'An unexpected error occurred.',
+            default => $exception->getMessage(),
         };
     }
 

@@ -2,57 +2,78 @@
 
 namespace App\Services;
 
+use App\Enums\EventStatus;
+use App\Http\Requests\StoreEventRequest;
 use App\Models\Event;
 use App\Repositories\EventRepository;
+use App\Repositories\WeekdayRepository;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Model;
 
 class EventService
 {
-    public function __construct(protected EventRepository $repository) {}
+    public function __construct(
+        protected EventRepository $eventRepository,
+        protected WeekdayRepository $weekdayRepository,
+    ) {}
 
-    public function getEvents(): Collection
+    public function getAllEvents(): Collection
     {
-        return $this->repository->all();
+        return $this->eventRepository->all();
     }
 
-    public function getDateSessions(int $classroomId, string $date)
+    public function getEvents(int $classroomId, string $date): Collection
     {
-
-        // Convert the date to Carbon for easier manipulation
-        $carbonDate = Carbon::parse($date);
-
-        // Get the day name to find the corresponding week_day configuration
-        $dayName = $carbonDate->format('l');
-
-        return $this->repository->query()
-            ->with(['user', 'weekday']) // Eager load relationships
-            ->where('classroom_id', $classroomId)
-            ->where('date', $date)
-            ->whereHas('weekday', function ($query) use ($dayName) {
-                $query->where('name', $dayName)
-                    ->where('is_working_day', true);
-            })
-            ->orderBy('start_time')
-            ->get()
+        return $this->eventRepository->getPreservedEvents($classroomId, $date)
             ->map(function (Event $event) {
                 return [
-                    'id' => $event->id,
-                    'title' => $event->title,
-                    'description' => $event->description,
-                    'start_time' => $event->start_time,
-                    'end_time' => $event->end_time,
-                    'status' => $event->status,
-                    'user' => [
-                        'id' => $event->user->id,
-                        'name' => $event->user->name,
-                        'email' => $event->user->email,
-                    ],
-                    'duration' => $event->weekday->session_duration . ' minutes',
+                    'start_time' => Carbon::parse($event->start_time)->format('H:i'),
+                    'end_time' => Carbon::parse($event->end_time)->format('H:i'),
                 ];
             });
+    }
 
+    /**
+     * @throws Exception
+     */
+    public function reserve(StoreEventRequest $request): Model
+    {
+        $dayName = Carbon::parse($request->date)->dayName;
+        $weekday = $this->weekdayRepository->findByName($dayName);
+
+        if (!$weekday->is_working_day) {
+            throw new Exception(
+                message: 'Reservations are not allowed on this day.',
+                code: 422
+            );
+        }
+
+        $isEventExists = $this->eventRepository->eventExists(
+            classroomId: $request->classroom_id,
+            date: $request->date,
+            startTime: $request->start_time,
+            endTime: $request->end_time,
+        );
+
+        if ($isEventExists) {
+            throw new Exception(
+                message: 'This session is already reserved.',
+                code: 422
+            );
+        }
+
+        return $this->eventRepository->create([
+            'classroom_id' => $request->classroom_id,
+            'user_id' => $request->user_id,
+            'weekday_id' => $weekday->id,
+            'title' => $request->title,
+            'date' => $request->date,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+            'description' => $request->description,
+            'status' => EventStatus::SCHEDULED->value
+        ]);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api\v1;
 
 use App\Exceptions\ApiExceptionHandler;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreEventRequest;
 use App\Http\Resources\EventResource;
 use App\Services\EventService;
 use Illuminate\Http\JsonResponse;
@@ -20,7 +21,7 @@ class EventController extends Controller
     {
         try {
             return response()->json(
-              data: EventResource::collection($this->service->getEvents()),
+              data: EventResource::collection($this->service->getallEvents()),
               status: ResponseStatus::HTTP_OK
             );
         } catch (Throwable $exception) {
@@ -28,9 +29,16 @@ class EventController extends Controller
         }
     }
 
-    public function store()
+    public function store(StoreEventRequest $request): JsonResponse
     {
-        //
+        try {
+            return response()->json(
+                data: EventResource::make($this->service->reserve($request)),
+                status: ResponseStatus::HTTP_CREATED
+            );
+        } catch (Throwable $exception) {
+            return ApiExceptionHandler::handle($exception);
+        }
     }
 
     public function show()
@@ -46,20 +54,5 @@ class EventController extends Controller
     public function destroy()
     {
         //
-    }
-
-    public function sessions(Request $request): JsonResponse
-    {
-        $classroomId = $request->get('classroom_id');
-        $date = $request->get('date');
-
-        try {
-            return response()->json(
-                data: $this->service->getDateSessions($classroomId, $date),
-                status: ResponseStatus::HTTP_OK,
-            );
-        } catch (Throwable $exception) {
-            return ApiExceptionHandler::handle($exception);
-        }
     }
 }
