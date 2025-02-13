@@ -10,6 +10,7 @@ use App\Repositories\WeekdayRepository;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Database\Eloquent\Model;
 
 class EventService
@@ -21,10 +22,10 @@ class EventService
 
     public function getAllEvents(): Collection
     {
-        return $this->eventRepository->all();
+        return $this->eventRepository->query()->orderBy('created_at', 'desc')->get();
     }
 
-    public function getEvents(int $classroomId, string $date): Collection
+    public function getEvents(int $classroomId, string $date): SupportCollection
     {
         return $this->eventRepository->getPreservedEvents($classroomId, $date)
             ->map(function (Event $event) {
