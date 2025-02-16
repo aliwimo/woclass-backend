@@ -13,7 +13,7 @@ This is a Laravel app for scheduling classes and events.
 
 - Clone the repository and run
 ```shell
-`composer install`
+composer install
 ```
 - Install node dependencies
 ```shell
