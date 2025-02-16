@@ -2,27 +2,24 @@
 
 namespace App\Http\Controllers\api\v1\auth;
 
+use App\Exceptions\ApiExceptionHandler;
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\LoginRequest;
+use App\Services\AuthService;
+use Illuminate\Http\JsonResponse;
+use Throwable;
 
 class LoginController extends Controller
 {
-    public function login(Request $request)
+
+    public function __construct( protected AuthService $service) {}
+
+    public function login(LoginRequest $request): JsonResponse
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json([
-                'message' => 'Invalid login details'
-            ], 401);
+        try {
+            return $this->service->login($request);
+        } catch (Throwable $exception) {
+            return ApiExceptionHandler::handle($exception);
         }
-
-        $user = User::where('email', $request['email'])->firstOrFail();
-
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'token' => $token,
-        ]);
     }
 }
