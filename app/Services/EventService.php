@@ -22,7 +22,7 @@ class EventService
 
     public function getAllEvents(): Collection
     {
-        return $this->eventRepository->query()->orderBy('created_at', 'desc')->get();
+        return $this->eventRepository->query()->with(['user', 'classroom'])->orderBy('created_at', 'desc')->get();
     }
 
     public function getEvents(int $classroomId, string $date): SupportCollection
@@ -67,7 +67,7 @@ class EventService
 
         return $this->eventRepository->create([
             'classroom_id' => $request->classroom_id,
-            'user_id' => $request->user_id,
+            'user_id' => auth()->id(),
             'weekday_id' => $weekday->id,
             'title' => $request->title,
             'date' => $request->date,

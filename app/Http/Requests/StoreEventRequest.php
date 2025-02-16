@@ -6,7 +6,6 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * @property int $user_id
  * @property int $classroom_id
  * @property string $date
  * @property string $start_time
@@ -32,7 +31,6 @@ class StoreEventRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => ['required', 'int', 'exists:users,id'],
             'classroom_id' => ['required', 'int', 'exists:classrooms,id'],
             'date' => ['required', 'date'],
             'start_time' => ['required', 'date_format:H:i'],
