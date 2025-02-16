@@ -4,7 +4,7 @@ namespace App\Http\Controllers\api\v1\auth;
 
 use App\Exceptions\ApiExceptionHandler;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Throwable;
@@ -13,7 +13,7 @@ class RegisterController extends Controller
 {
     public function __construct( protected AuthService $service) {}
 
-    public function login(LoginRequest $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
         try {
             return $this->service->register($request);

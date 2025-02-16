@@ -5,9 +5,8 @@ namespace App\Http\Controllers\api\v1\auth;
 use App\Exceptions\ApiExceptionHandler;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
-use App\Http\Resources\EventResource;
 use App\Services\AuthService;
-use Symfony\Component\HttpFoundation\Response as ResponseStatus;
+use Illuminate\Http\JsonResponse;
 use Throwable;
 
 class LoginController extends Controller
@@ -15,7 +14,7 @@ class LoginController extends Controller
 
     public function __construct( protected AuthService $service) {}
 
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): JsonResponse
     {
         try {
             return $this->service->login($request);
