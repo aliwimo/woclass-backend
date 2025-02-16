@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use App\Enums\EventStatus;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -23,6 +22,8 @@ class EventResource extends JsonResource
             'end_time' => $this->whenNotNull($this->end_time),
             'description' => $this->whenNotNull($this->description),
             'status' => $this->whenNotNull($this->status->value),
+            'user' => UserResource::make($this->whenLoaded('user')),
+            'classroom' => ClassroomResource::make($this->whenLoaded('classroom')),
         ];
     }
 }
